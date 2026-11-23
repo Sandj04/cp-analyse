@@ -1,0 +1,64 @@
+l: info
+t: info
+q: Welkom! Dit onderzoek is onderdeel van het vak Cognitie en Perceptie (Universiteit van Amsterdam). We onderzoeken het verband tussen het kijken van short-form video's en het werkgeheugen.<br><br>
+Je doet eerst een korte geheugentaak en beantwoordt daarna een paar korte vragen. Dit duurt ongeveer 5 minuten.<br><br>
+<b>Privacy</b><br>
+&bull; Deelname is vrijwillig. Je mag op elk moment stoppen, zonder opgaaf van reden.<br>
+&bull; We vragen niet naar je naam, studentnummer of e-mailadres. Je antwoorden zijn anoniem.<br>
+&bull; We verzamelen alleen gegevens die nodig zijn voor dit onderzoek, volgens de AVG (privacywet).<br>
+&bull; De gegevens worden opgeslagen op de PsyToolkit-server in Europa en zijn alleen toegankelijk voor de onderzoekers.<br>
+&bull; Resultaten worden alleen op groepsniveau gerapporteerd. Na afloop van het vak worden de gegevens verwijderd.<br><br>
+Doe dit onderzoek op een laptop of computer (met toetsenbord), niet op je telefoon.
+
+l: consent
+t: radio
+q: Ga je akkoord met deelname aan dit onderzoek?
+- Ja, ik doe mee
+- Nee, ik doe niet mee
+
+j: if $consent == 2 then goto einde
+
+l: leeftijd
+t: textline
+q: Wat is je leeftijd?
+- {min=16,max=99} Leeftijd in jaren
+
+l: gender
+t: radio
+q: Wat is je gender?
+- Man
+- Vrouw
+- Anders
+- Zeg ik liever niet
+
+l: uitleg_taak
+t: info
+q: Je gaat nu een geheugentaak doen. Je ziet steeds een letter op het scherm.<br>
+Druk op de <b>M</b>-toets als de letter hetzelfde is als de letter van <b>twee letters terug</b>. Anders druk je niets.<br>
+Eerst krijg je een oefenblok, daarna twee echte blokken. De instructies in de taak zijn in het Engels.<br>
+De taak opent op volledig scherm.
+
+l: nback
+t: experiment
+- nback2
+
+l: shortform_min
+t: textline
+q: Hoeveel minuten per dag besteed je gemiddeld aan short-form video's (TikTok, Instagram Reels en YouTube Shorts samen)?<br>
+Kijk als het kan in de schermtijd-instellingen van je telefoon naar het daggemiddelde van de afgelopen week.
+- {min=0,max=1440} Minuten per dag
+
+l: shortform_bron
+t: radio
+q: Hoe kwam je aan het antwoord op de vorige vraag?
+- Opgezocht in mijn schermtijd
+- Geschat
+
+l: slaap
+t: textline
+q: Hoeveel uur heb je afgelopen nacht ongeveer geslapen?
+- {min=0,max=24} Uren
+
+l: einde
+t: info
+q: Bedankt voor je deelname!
