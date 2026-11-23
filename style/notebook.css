@@ -1,0 +1,368 @@
+/* Notebook page styles — loaded after nbconvert's JupyterLab CSS (assets/jupyter.css). */
+
+:root {
+  /* Layers, back to front: viewport → sheet → cell → code */
+  --nb-viewport: #e8e9ec;
+  --nb-sheet: #ffffff;
+  --nb-cell: #fbfbfc;
+  --nb-code: #f3f4f6;
+  --nb-chip: #eceef1;
+  --nb-head: #f3f4f6;
+  --nb-stripe: #f9fafb;
+  --nb-hover: #eef0f3;
+
+  --nb-ink: #18191b;
+  --nb-text: #2b2d31;
+  --nb-muted: #686c73;
+  --nb-faint: #9a9ea5;
+  --nb-border: #e3e5e8;
+  --nb-border-strong: #cdd0d5;
+  --nb-accent: #2a78d6;
+
+  --nb-max-width: 1180px;
+  --nb-pad: 64px;
+  --nb-radius: 14px;
+
+  --jp-content-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --jp-ui-font-family: var(--jp-content-font-family);
+  --jp-code-font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --jp-content-font-size1: 15px;
+  --jp-content-line-height: 1.65;
+  --jp-code-font-size: 13px;
+  --jp-code-line-height: 1.55;
+  --jp-content-font-color1: var(--nb-text);
+  --jp-ui-font-color1: var(--nb-text);
+  --jp-content-link-color: var(--nb-accent);
+  --jp-cell-editor-background: var(--nb-code);
+  --jp-cell-editor-border-color: var(--nb-border);
+  --jp-rendermime-table-row-hover-background: var(--nb-hover);
+}
+
+/* ---------- Viewport & sheet ---------- */
+html,
+body.jp-Notebook {
+  background: var(--nb-viewport);
+}
+
+body.jp-Notebook {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  color: var(--nb-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Centered sheet: identical margin on the left and right */
+body.jp-Notebook > main {
+  box-sizing: border-box;
+  max-width: var(--nb-max-width);
+  margin: 40px auto 64px;
+  padding: 64px var(--nb-pad) 80px;
+  background: var(--nb-sheet);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius);
+  box-shadow:
+    0 1px 2px rgba(16, 18, 22, 0.04),
+    0 12px 32px -8px rgba(16, 18, 22, 0.08);
+}
+
+@media (max-width: 1260px) {
+  body.jp-Notebook > main {
+    margin: 24px 24px 48px;
+    padding: 48px 40px 64px;
+  }
+}
+
+@media (max-width: 700px) {
+  body.jp-Notebook > main {
+    margin: 0;
+    padding: 32px 16px 48px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* Drop the prompt column so content is not pushed to the right */
+.jp-InputPrompt,
+.jp-OutputPrompt,
+.jp-Collapser {
+  display: none !important;
+}
+
+.jp-Cell {
+  padding: 0;
+  margin: 0 0 24px;
+}
+
+.jp-InputArea,
+.jp-OutputArea-child {
+  display: block;
+  overflow: visible;
+}
+
+.jp-OutputArea-output {
+  display: block;
+  width: auto;
+}
+
+.jp-RenderedHTMLCommon {
+  padding-right: 0;
+}
+
+/* Markdown spans the full sheet width and lines up with the code cards */
+.jp-MarkdownOutput {
+  display: block;
+  width: auto;
+  padding-left: 0;
+}
+
+/* ---------- Markdown ---------- */
+.jp-RenderedMarkdown h1,
+.jp-RenderedMarkdown h2,
+.jp-RenderedMarkdown h3,
+.jp-RenderedMarkdown h4 {
+  color: var(--nb-ink);
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.jp-RenderedMarkdown h1 {
+  font-size: 32px;
+  margin: 0 0 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--nb-border);
+}
+
+.jp-RenderedMarkdown h2 {
+  font-size: 23px;
+  margin: 48px 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--nb-border);
+}
+
+.jp-RenderedMarkdown h3 {
+  font-size: 17px;
+  margin: 28px 0 8px;
+}
+
+.jp-RenderedMarkdown h4 {
+  font-size: 15px;
+  margin: 20px 0 6px;
+}
+
+.jp-RenderedMarkdown > :first-child {
+  margin-top: 0;
+}
+
+.jp-RenderedMarkdown p,
+.jp-RenderedMarkdown ul,
+.jp-RenderedMarkdown ol {
+  margin: 0 0 12px;
+}
+
+.jp-RenderedMarkdown li {
+  margin-bottom: 4px;
+}
+
+.jp-RenderedMarkdown strong {
+  color: var(--nb-ink);
+}
+
+.jp-RenderedHTMLCommon a {
+  color: var(--nb-accent);
+  text-decoration: none;
+}
+
+.jp-RenderedHTMLCommon a:hover {
+  text-decoration: underline;
+}
+
+.jp-RenderedMarkdown code {
+  font-family: var(--jp-code-font-family);
+  font-size: 0.86em;
+  background: var(--nb-chip);
+  border-radius: 5px;
+  padding: 0.12em 0.4em;
+  color: var(--nb-ink);
+}
+
+/* ---------- Code cells: one card holding input + output ---------- */
+.jp-CodeCell {
+  background: var(--nb-cell);
+  border: 1px solid var(--nb-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 18, 22, 0.03);
+}
+
+.jp-InputArea-editor {
+  display: block;
+  border: none;
+  border-radius: 0;
+  background: var(--nb-code);
+  overflow-x: auto;
+}
+
+.jp-CodeCell:not(.jp-mod-noOutputs) .jp-InputArea-editor {
+  border-bottom: 1px solid var(--nb-border);
+}
+
+.jp-CodeCell .highlight {
+  background: transparent;
+}
+
+.cm-editor.cm-s-jupyter .highlight pre {
+  padding: 16px 20px;
+  font-family: var(--jp-code-font-family);
+  font-size: var(--jp-code-font-size);
+  line-height: var(--jp-code-line-height);
+}
+
+/* ---------- Outputs ---------- */
+.jp-Cell-outputWrapper {
+  margin: 0;
+}
+
+.jp-OutputArea {
+  padding: 16px 20px;
+}
+
+.jp-OutputArea-child + .jp-OutputArea-child {
+  margin-top: 12px;
+}
+
+.jp-RenderedText pre {
+  font-family: var(--jp-code-font-family);
+  font-size: var(--jp-code-font-size);
+  line-height: var(--jp-code-line-height);
+  color: var(--nb-muted);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.jp-RenderedImage {
+  text-align: center;
+}
+
+.jp-RenderedImage img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  background: var(--nb-sheet);
+  border: 1px solid var(--nb-border);
+  border-radius: 8px;
+}
+
+/* Wide dataframes scroll instead of breaking the sheet */
+.jp-RenderedHTML > div {
+  overflow-x: auto;
+}
+
+/* ---------- Tables (left-aligned, like the VS Code notebook editor) ---------- */
+.jp-RenderedHTMLCommon table,
+.jp-OutputArea-output.jp-RenderedHTMLCommon table {
+  margin: 8px 0 16px;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--nb-text);
+  background: var(--nb-sheet);
+  border: 1px solid var(--nb-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.jp-OutputArea-output.jp-RenderedHTMLCommon table {
+  margin: 0;
+}
+
+.jp-RenderedHTMLCommon thead {
+  border: none;
+}
+
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td {
+  padding: 7px 14px;
+  border: none;
+  border-bottom: 1px solid var(--nb-border);
+}
+
+.jp-RenderedHTMLCommon tbody tr:last-child th,
+.jp-RenderedHTMLCommon tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.jp-RenderedHTMLCommon thead th {
+  background: var(--nb-head);
+  font-weight: 600;
+  color: var(--nb-muted);
+  border-bottom: 1px solid var(--nb-border-strong);
+  white-space: nowrap;
+}
+
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd) {
+  background: var(--nb-sheet);
+}
+
+.jp-RenderedHTMLCommon tbody tr:nth-child(even) {
+  background: var(--nb-stripe);
+}
+
+.jp-RenderedHTMLCommon tbody tr:hover {
+  background: var(--nb-hover);
+}
+
+/* Markdown tables scroll on narrow screens */
+.jp-RenderedMarkdown.jp-RenderedHTMLCommon table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Markdown tables: everything left-aligned */
+.jp-RenderedMarkdown.jp-RenderedHTMLCommon th,
+.jp-RenderedMarkdown.jp-RenderedHTMLCommon td {
+  text-align: left;
+}
+
+/* Dataframes keep cells on one line and scroll sideways when too wide */
+.dataframe th,
+.dataframe td {
+  white-space: nowrap;
+}
+
+/* Dataframes: row index left, numbers right */
+.dataframe tbody th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--nb-ink);
+}
+
+/* Captions pandas prints below truncated frames ("800 rows × 9 columns") */
+.jp-RenderedHTML > div > p {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--nb-faint);
+}
+
+@media print {
+  html,
+  body.jp-Notebook {
+    background: #ffffff;
+  }
+  body.jp-Notebook > main {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+  .jp-InputArea-editor {
+    overflow: visible;
+  }
+}
