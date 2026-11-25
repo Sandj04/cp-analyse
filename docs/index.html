@@ -1654,8 +1654,8 @@ Er waren 3 tests (blok) van 25 trails, geeft: 3 x 25 = 75 rijen per bestand.</p>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Exclusion-criteria">Exclusion criteria<a class="anchor-link" href="#Exclusion-criteria">¶</a></h2><p>Deelnemers worden uitgesloten met:</p>
 <ul>
-<li>ontbrekende gegevens</li>
 <li>geen consent</li>
+<li>ontbrekende gegevens</li>
 <li>gecorrigeerde trefferkans van nul of lager</li>
 </ul>
 </div>
@@ -1669,14 +1669,20 @@ Er waren 3 tests (blok) van 25 trails, geeft: 3 x 25 = 75 rijen per bestand.</p>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">num_full</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="n">excluded</span> <span class="o">=</span> <span class="p">{}</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'consent'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'ja'</span><span class="p">]</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'accuracy'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">exclude</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">keep</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">reden</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">excluded</span><span class="p">[</span><span class="n">reden</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="o">~</span><span class="n">keep</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">exclude</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"consent"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"ja"</span><span class="p">,</span> <span class="s2">"het ontbreken van toestemming"</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">exclude</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="s2">"ontbrekende gegevens"</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">exclude</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"accuracy"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"een gecorrigeerde trefferkans van nul of lager"</span><span class="p">)</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Totaal participanten: </span><span class="si">{</span><span class="n">num_full</span><span class="si">}</span><span class="se">\n</span><span class="s2">Participanten excl. criteria: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Uitgesloten:"</span><span class="p">,</span> <span class="n">excluded</span><span class="p">)</span>
 <span class="n">dataset</span>
 </pre></div>
 </div>
@@ -1691,6 +1697,7 @@ Er waren 3 tests (blok) van 25 trails, geeft: 3 x 25 = 75 rijen per bestand.</p>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Totaal participanten: 19
 Participanten excl. criteria: 17
+Uitgesloten: {'het ontbreken van toestemming': 1, 'ontbrekende gegevens': 1, 'een gecorrigeerde trefferkans van nul of lager': 0}
 </pre>
 </div>
 </div>
@@ -2305,7 +2312,7 @@ Short-form bron: {'opgezocht': 11, 'geschat': 6}
 <span class="p">]</span>
 
 <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">apa</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> (n = </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">n</span><span class="si">}</span><span class="s2">):</span><span class="se">\n\t</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">apa</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2317,10 +2324,18 @@ Short-form bron: {'opgezocht': 11, 'geschat': 6}
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Hoofd: kijktijd x gecorrigeerde trefferkans: r_s(15) = -.37, p = .145
-Neven: kijktijd x RT: r_s(15) = .58, p = .015
-Covariaat: controle slaap: r_s(14) = -.44, p = .092
-Sensitiviteit: alleen opgezocht: r_s(9) = -.30, p = .370
+<pre>Hoofd: kijktijd x gecorrigeerde trefferkans (n = 17):
+	r_s(15) = -.37, p = .145
+
+Neven: kijktijd x RT (n = 17):
+	r_s(15) = .58, p = .015
+
+Covariaat: controle slaap (n = 17):
+	r_s(14) = -.44, p = .092
+
+Sensitiviteit: alleen opgezocht (n = 11):
+	r_s(9) = -.30, p = .370
+
 </pre>
 </div>
 </div>
@@ -2357,6 +2372,140 @@ Sensitiviteit: alleen opgezocht: r_s(9) = -.30, p = .370
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
 <img alt="figure-2" class="" src="assets/figures/figure-2.png"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b73fe7d0">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8a773244">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Appendix:-variables.tex">Appendix: variables.tex<a class="anchor-link" href="#Appendix:-variables.tex">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c7d3d45f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># format:</span>
+<span class="c1"># \newcommand{\variable}{value}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">num</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dec</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">dec</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">"</span>
+
+<span class="n">reasons</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">excluded</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">}</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reasons</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2"> ($n = </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">$)"</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">reasons</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+    <span class="n">reden</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">" en "</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">reden</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">reasons</span><span class="p">),</span> <span class="s2">""</span><span class="p">)</span>
+
+<span class="n">n_opgezocht</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">dataset</span><span class="o">.</span><span class="n">bron_label</span> <span class="o">==</span> <span class="s2">"opgezocht"</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+<span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"Ntotaal"</span><span class="p">:</span> <span class="n">num_full</span><span class="p">,</span>
+    <span class="s2">"Nuitgesloten"</span><span class="p">:</span> <span class="n">num_full</span> <span class="o">-</span> <span class="n">N</span><span class="p">,</span>
+    <span class="s2">"Uitsluitreden"</span><span class="p">:</span> <span class="n">reden</span><span class="p">,</span>
+    <span class="s2">"Nanalyse"</span><span class="p">:</span> <span class="n">N</span><span class="p">,</span>
+    <span class="s2">"Nopgezocht"</span><span class="p">:</span> <span class="n">n_opgezocht</span><span class="p">,</span>
+    <span class="s2">"Popgezocht"</span><span class="p">:</span> <span class="n">num</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">n_opgezocht</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="c1"># tabel 1 (kolom, prefix, decimalen m/sd, decimalen min/max)</span>
+<span class="n">table</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">"shortform_min"</span><span class="p">,</span> <span class="s2">"Kijktijd"</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"accuracy"</span><span class="p">,</span>      <span class="s2">"Acc"</span><span class="p">,</span>      <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"rt_median"</span><span class="p">,</span>     <span class="s2">"Rt"</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"slaap"</span><span class="p">,</span>         <span class="s2">"Slaap"</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">dec_range</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
+    <span class="n">variables</span> <span class="o">|=</span> <span class="p">{</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">M"</span><span class="p">:</span>   <span class="n">num</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">dec</span><span class="p">),</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SD"</span><span class="p">:</span>  <span class="n">num</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span> <span class="n">dec</span><span class="p">),</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Min"</span><span class="p">:</span> <span class="n">num</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">dec_range</span><span class="p">),</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Max"</span><span class="p">:</span> <span class="n">num</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">dec_range</span><span class="p">),</span>
+    <span class="p">}</span>
+
+<span class="c1"># Correlaties in dezelfde volgorde als results</span>
+<span class="k">for</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s2">"Hoofd"</span><span class="p">,</span> <span class="s2">"Neven"</span><span class="p">,</span> <span class="s2">"Partieel"</span><span class="p">,</span> <span class="s2">"Sens"</span><span class="p">],</span> <span class="n">results</span><span class="p">):</span>
+    <span class="n">variables</span> <span class="o">|=</span> <span class="p">{</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">N"</span><span class="p">:</span>   <span class="n">r</span><span class="o">.</span><span class="n">n</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Df"</span><span class="p">:</span>  <span class="n">r</span><span class="o">.</span><span class="n">df</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Rho"</span><span class="p">:</span> <span class="n">fmt</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">rho</span><span class="p">),</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">P"</span><span class="p">:</span>   <span class="n">fmt_p</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">p</span><span class="p">),</span>
+    <span class="p">}</span>
+
+<span class="n">tex</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\\</span><span class="s2">newcommand</span><span class="se">{{\\</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="se">}}{{</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="se">}}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+<span class="n">Path</span><span class="p">(</span><span class="s2">"variables.tex"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">tex</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tex</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>\newcommand{\Ntotaal}{19}
+\newcommand{\Nuitgesloten}{2}
+\newcommand{\Uitsluitreden}{het ontbreken van toestemming ($n = 1$) en ontbrekende gegevens ($n = 1$)}
+\newcommand{\Nanalyse}{17}
+\newcommand{\Nopgezocht}{11}
+\newcommand{\Popgezocht}{65}
+\newcommand{\KijktijdM}{130.2}
+\newcommand{\KijktijdSD}{99.9}
+\newcommand{\KijktijdMin}{0}
+\newcommand{\KijktijdMax}{360}
+\newcommand{\AccM}{67.7}
+\newcommand{\AccSD}{21.2}
+\newcommand{\AccMin}{20.0}
+\newcommand{\AccMax}{96.7}
+\newcommand{\RtM}{547}
+\newcommand{\RtSD}{116}
+\newcommand{\RtMin}{370}
+\newcommand{\RtMax}{718}
+\newcommand{\SlaapM}{7.1}
+\newcommand{\SlaapSD}{1.3}
+\newcommand{\SlaapMin}{5}
+\newcommand{\SlaapMax}{10}
+\newcommand{\HoofdN}{17}
+\newcommand{\HoofdDf}{15}
+\newcommand{\HoofdRho}{-.37}
+\newcommand{\HoofdP}{= .145}
+\newcommand{\NevenN}{17}
+\newcommand{\NevenDf}{15}
+\newcommand{\NevenRho}{.58}
+\newcommand{\NevenP}{= .015}
+\newcommand{\PartieelN}{17}
+\newcommand{\PartieelDf}{14}
+\newcommand{\PartieelRho}{-.44}
+\newcommand{\PartieelP}{= .092}
+\newcommand{\SensN}{11}
+\newcommand{\SensDf}{9}
+\newcommand{\SensRho}{-.30}
+\newcommand{\SensP}{= .370}
+
+</pre>
 </div>
 </div>
 </div>
