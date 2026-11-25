@@ -550,6 +550,16 @@
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ff41a3f1">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Imports,-globals-and-helpers">Imports, globals and helpers<a class="anchor-link" href="#Imports,-globals-and-helpers">¶</a></h2>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=59901b9c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -562,8 +572,26 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.formula.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smf</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.multitest</span><span class="w"> </span><span class="kn">import</span> <span class="n">multipletests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pingouin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpearmanResult</span><span class="p">:</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">n</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">df</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">p</span><span class="p">:</span> <span class="nb">float</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">apa</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"r_s(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">fmt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="p">)</span><span class="si">}</span><span class="s2">, p </span><span class="si">{</span><span class="n">fmt_p</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">fmt</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dec</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">dec</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"0."</span><span class="p">,</span> <span class="s2">"."</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">s</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">fmt_p</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">"&lt; .001"</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.001</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"= </span><span class="si">{</span><span class="n">fmt</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
 
 <span class="n">ALPHA</span> <span class="o">=</span> <span class="mf">0.05</span>
 <span class="n">DATA</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span>
@@ -615,10 +643,6 @@
 <span class="n">survey</span><span class="p">[</span><span class="s2">"gender_label"</span><span class="p">]</span> <span class="o">=</span> <span class="n">survey</span><span class="p">[</span><span class="s2">"gender"</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="s2">"man"</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">"vrouw"</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">"anders"</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s2">"zeg ik liever niet"</span><span class="p">})</span>
 <span class="n">survey</span><span class="p">[</span><span class="s2">"bron_label"</span><span class="p">]</span> <span class="o">=</span> <span class="n">survey</span><span class="p">[</span><span class="s2">"shortform_bron"</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="s2">"opgezocht"</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">"geschat"</span><span class="p">})</span>
 <span class="n">survey</span> <span class="o">=</span> <span class="n">survey</span><span class="p">[[</span><span class="s2">"uuid"</span><span class="p">,</span> <span class="s2">"consent"</span><span class="p">,</span> <span class="s2">"leeftijd"</span><span class="p">,</span> <span class="s2">"gender_label"</span><span class="p">,</span> <span class="s2">"shortform_min"</span><span class="p">,</span> <span class="s2">"bron_label"</span><span class="p">,</span> <span class="s2">"slaap"</span><span class="p">]]</span>
-
-<span class="c1"># remove entries with no consent</span>
-<span class="n">survey</span> <span class="o">=</span> <span class="n">survey</span><span class="p">[</span><span class="n">survey</span><span class="p">[</span><span class="s1">'consent'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'ja'</span><span class="p">]</span>
-<span class="n">survey</span> <span class="o">=</span> <span class="n">survey</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">display</span><span class="p">(</span><span class="n">survey</span><span class="p">)</span>
 </pre></div>
@@ -752,6 +776,16 @@
 </tr>
 <tr>
 <th>9</th>
+<td>8d86fb91-4287-41d8-82f3-ecd43f2e4b7d</td>
+<td>nee</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>10</th>
 <td>8f8d17b9-d72d-4f76-b254-a842afa2a753</td>
 <td>ja</td>
 <td>19.0</td>
@@ -761,7 +795,7 @@
 <td>7.0</td>
 </tr>
 <tr>
-<th>10</th>
+<th>11</th>
 <td>a601c3ea-a71e-4160-a2b9-d798da2810b1</td>
 <td>ja</td>
 <td>21.0</td>
@@ -771,7 +805,7 @@
 <td>5.0</td>
 </tr>
 <tr>
-<th>11</th>
+<th>12</th>
 <td>a65ce376-b73a-4cfe-88f0-f4a384e57a0b</td>
 <td>ja</td>
 <td>17.0</td>
@@ -781,7 +815,7 @@
 <td>8.0</td>
 </tr>
 <tr>
-<th>12</th>
+<th>13</th>
 <td>b4f1e5ef-4abe-4cdf-b150-71deacdf3d7f</td>
 <td>ja</td>
 <td>19.0</td>
@@ -791,7 +825,7 @@
 <td>8.0</td>
 </tr>
 <tr>
-<th>13</th>
+<th>14</th>
 <td>c4e43bb0-1dce-4bba-831a-db3b48fb965a</td>
 <td>ja</td>
 <td>22.0</td>
@@ -801,7 +835,7 @@
 <td>8.0</td>
 </tr>
 <tr>
-<th>14</th>
+<th>15</th>
 <td>cd8883b2-12e3-437d-b1bb-385ada445af4</td>
 <td>ja</td>
 <td>22.0</td>
@@ -811,7 +845,7 @@
 <td>7.0</td>
 </tr>
 <tr>
-<th>15</th>
+<th>16</th>
 <td>d104c9d1-4305-4dbc-abb5-b9e7e2312b33</td>
 <td>ja</td>
 <td>19.0</td>
@@ -821,7 +855,7 @@
 <td>6.0</td>
 </tr>
 <tr>
-<th>16</th>
+<th>17</th>
 <td>d988408f-a7aa-4c7b-bea8-dd7286bc4976</td>
 <td>ja</td>
 <td>21.0</td>
@@ -831,7 +865,7 @@
 <td>7.0</td>
 </tr>
 <tr>
-<th>17</th>
+<th>18</th>
 <td>dba49510-8676-447f-9c54-c3cbe940e907</td>
 <td>ja</td>
 <td>20.0</td>
@@ -1407,6 +1441,481 @@ Er waren 3 tests (blok) van 25 trails, geeft: 3 x 25 = 75 rijen per bestand.</p>
 </tr>
 <tr>
 <th>9</th>
+<td>8d86fb91-4287-41d8-82f3-ecd43f2e4b7d</td>
+<td>nee</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>10</th>
+<td>8f8d17b9-d72d-4f76-b254-a842afa2a753</td>
+<td>ja</td>
+<td>19.0</td>
+<td>vrouw</td>
+<td>150.0</td>
+<td>opgezocht</td>
+<td>7.0</td>
+<td>50.0</td>
+<td>14.0</td>
+<td>9.0</td>
+<td>4.0</td>
+<td>0.643</td>
+<td>0.111</td>
+<td>53.175</td>
+<td>594.0</td>
+<td>621.556</td>
+<td>9.0</td>
+</tr>
+<tr>
+<th>11</th>
+<td>a601c3ea-a71e-4160-a2b9-d798da2810b1</td>
+<td>ja</td>
+<td>21.0</td>
+<td>vrouw</td>
+<td>300.0</td>
+<td>opgezocht</td>
+<td>5.0</td>
+<td>50.0</td>
+<td>19.0</td>
+<td>9.0</td>
+<td>4.0</td>
+<td>0.474</td>
+<td>0.129</td>
+<td>34.465</td>
+<td>718.0</td>
+<td>767.000</td>
+<td>9.0</td>
+</tr>
+<tr>
+<th>12</th>
+<td>a65ce376-b73a-4cfe-88f0-f4a384e57a0b</td>
+<td>ja</td>
+<td>17.0</td>
+<td>zeg ik liever niet</td>
+<td>0.0</td>
+<td>opgezocht</td>
+<td>8.0</td>
+<td>50.0</td>
+<td>10.0</td>
+<td>5.0</td>
+<td>12.0</td>
+<td>0.500</td>
+<td>0.300</td>
+<td>20.000</td>
+<td>370.0</td>
+<td>378.600</td>
+<td>5.0</td>
+</tr>
+<tr>
+<th>13</th>
+<td>b4f1e5ef-4abe-4cdf-b150-71deacdf3d7f</td>
+<td>ja</td>
+<td>19.0</td>
+<td>man</td>
+<td>120.0</td>
+<td>geschat</td>
+<td>8.0</td>
+<td>50.0</td>
+<td>14.0</td>
+<td>10.0</td>
+<td>5.0</td>
+<td>0.714</td>
+<td>0.139</td>
+<td>57.540</td>
+<td>493.0</td>
+<td>694.900</td>
+<td>10.0</td>
+</tr>
+<tr>
+<th>14</th>
+<td>c4e43bb0-1dce-4bba-831a-db3b48fb965a</td>
+<td>ja</td>
+<td>22.0</td>
+<td>man</td>
+<td>45.0</td>
+<td>geschat</td>
+<td>8.0</td>
+<td>50.0</td>
+<td>17.0</td>
+<td>14.0</td>
+<td>0.0</td>
+<td>0.824</td>
+<td>0.000</td>
+<td>82.353</td>
+<td>548.5</td>
+<td>511.643</td>
+<td>14.0</td>
+</tr>
+<tr>
+<th>15</th>
+<td>cd8883b2-12e3-437d-b1bb-385ada445af4</td>
+<td>ja</td>
+<td>22.0</td>
+<td>vrouw</td>
+<td>120.0</td>
+<td>geschat</td>
+<td>7.0</td>
+<td>50.0</td>
+<td>15.0</td>
+<td>13.0</td>
+<td>2.0</td>
+<td>0.867</td>
+<td>0.057</td>
+<td>80.952</td>
+<td>665.0</td>
+<td>653.692</td>
+<td>13.0</td>
+</tr>
+<tr>
+<th>16</th>
+<td>d104c9d1-4305-4dbc-abb5-b9e7e2312b33</td>
+<td>ja</td>
+<td>19.0</td>
+<td>man</td>
+<td>210.0</td>
+<td>geschat</td>
+<td>6.0</td>
+<td>50.0</td>
+<td>13.0</td>
+<td>11.0</td>
+<td>3.0</td>
+<td>0.846</td>
+<td>0.081</td>
+<td>76.507</td>
+<td>642.0</td>
+<td>681.273</td>
+<td>11.0</td>
+</tr>
+<tr>
+<th>17</th>
+<td>d988408f-a7aa-4c7b-bea8-dd7286bc4976</td>
+<td>ja</td>
+<td>21.0</td>
+<td>man</td>
+<td>70.0</td>
+<td>opgezocht</td>
+<td>7.0</td>
+<td>50.0</td>
+<td>15.0</td>
+<td>14.0</td>
+<td>0.0</td>
+<td>0.933</td>
+<td>0.000</td>
+<td>93.333</td>
+<td>400.5</td>
+<td>496.071</td>
+<td>14.0</td>
+</tr>
+<tr>
+<th>18</th>
+<td>dba49510-8676-447f-9c54-c3cbe940e907</td>
+<td>ja</td>
+<td>20.0</td>
+<td>vrouw</td>
+<td>300.0</td>
+<td>geschat</td>
+<td>9.0</td>
+<td>50.0</td>
+<td>19.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=11a21660">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Exclusion-criteria">Exclusion criteria<a class="anchor-link" href="#Exclusion-criteria">¶</a></h2><p>Deelnemers worden uitgesloten met:</p>
+<ul>
+<li>ontbrekende gegevens</li>
+<li>geen consent</li>
+<li>gecorrigeerde trefferkans van nul of lager</li>
+</ul>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3c337b43">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">num_full</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'consent'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'ja'</span><span class="p">]</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'accuracy'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Totaal participanten: </span><span class="si">{</span><span class="n">num_full</span><span class="si">}</span><span class="se">\n</span><span class="s2">Participanten excl. criteria: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">dataset</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Totaal participanten: 19
+Participanten excl. criteria: 17
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>uuid</th>
+<th>consent</th>
+<th>leeftijd</th>
+<th>gender_label</th>
+<th>shortform_min</th>
+<th>bron_label</th>
+<th>slaap</th>
+<th>n_trials</th>
+<th>n_targets</th>
+<th>hits</th>
+<th>false_alarms</th>
+<th>hit_rate</th>
+<th>fa_rate</th>
+<th>accuracy</th>
+<th>rt_median</th>
+<th>rt_mean</th>
+<th>n_rt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>06ac6dd9-2581-4147-a11b-08da3cbed35e</td>
+<td>ja</td>
+<td>21.0</td>
+<td>vrouw</td>
+<td>88.0</td>
+<td>opgezocht</td>
+<td>6.0</td>
+<td>50.0</td>
+<td>20.0</td>
+<td>20.0</td>
+<td>1.0</td>
+<td>1.000</td>
+<td>0.033</td>
+<td>96.667</td>
+<td>400.5</td>
+<td>451.200</td>
+<td>20.0</td>
+</tr>
+<tr>
+<th>1</th>
+<td>10ecf204-6e66-479d-9418-7c05b860ee7e</td>
+<td>ja</td>
+<td>23.0</td>
+<td>vrouw</td>
+<td>20.0</td>
+<td>opgezocht</td>
+<td>9.0</td>
+<td>50.0</td>
+<td>20.0</td>
+<td>15.0</td>
+<td>0.0</td>
+<td>0.750</td>
+<td>0.000</td>
+<td>75.000</td>
+<td>563.0</td>
+<td>560.133</td>
+<td>15.0</td>
+</tr>
+<tr>
+<th>2</th>
+<td>252c0ccc-6b8b-48b5-968b-4fa9832ee01f</td>
+<td>ja</td>
+<td>21.0</td>
+<td>man</td>
+<td>180.0</td>
+<td>opgezocht</td>
+<td>6.0</td>
+<td>50.0</td>
+<td>16.0</td>
+<td>10.0</td>
+<td>1.0</td>
+<td>0.625</td>
+<td>0.029</td>
+<td>59.559</td>
+<td>642.5</td>
+<td>661.900</td>
+<td>10.0</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2614051e-694e-4476-80c7-c5a2d1c9e8e5</td>
+<td>ja</td>
+<td>20.0</td>
+<td>anders</td>
+<td>60.0</td>
+<td>opgezocht</td>
+<td>8.0</td>
+<td>50.0</td>
+<td>15.0</td>
+<td>11.0</td>
+<td>0.0</td>
+<td>0.733</td>
+<td>0.000</td>
+<td>73.333</td>
+<td>641.0</td>
+<td>641.000</td>
+<td>11.0</td>
+</tr>
+<tr>
+<th>4</th>
+<td>3798b14a-1955-49fb-a3b7-26004923a6ac</td>
+<td>ja</td>
+<td>20.0</td>
+<td>vrouw</td>
+<td>40.0</td>
+<td>opgezocht</td>
+<td>10.0</td>
+<td>50.0</td>
+<td>12.0</td>
+<td>11.0</td>
+<td>1.0</td>
+<td>0.917</td>
+<td>0.026</td>
+<td>89.035</td>
+<td>422.0</td>
+<td>443.000</td>
+<td>11.0</td>
+</tr>
+<tr>
+<th>5</th>
+<td>3e84d5fd-2dcf-40f0-bb08-43427945129d</td>
+<td>ja</td>
+<td>19.0</td>
+<td>vrouw</td>
+<td>360.0</td>
+<td>opgezocht</td>
+<td>7.0</td>
+<td>50.0</td>
+<td>14.0</td>
+<td>7.0</td>
+<td>2.0</td>
+<td>0.500</td>
+<td>0.056</td>
+<td>44.444</td>
+<td>453.0</td>
+<td>608.429</td>
+<td>7.0</td>
+</tr>
+<tr>
+<th>6</th>
+<td>63359fbc-512e-4b0c-b45a-fbcc668dd068</td>
+<td>ja</td>
+<td>20.0</td>
+<td>man</td>
+<td>120.0</td>
+<td>geschat</td>
+<td>6.0</td>
+<td>50.0</td>
+<td>20.0</td>
+<td>20.0</td>
+<td>4.0</td>
+<td>1.000</td>
+<td>0.133</td>
+<td>86.667</td>
+<td>429.0</td>
+<td>517.750</td>
+<td>20.0</td>
+</tr>
+<tr>
+<th>7</th>
+<td>73b3b8e0-d90c-40b1-95ae-7500b6d1896f</td>
+<td>ja</td>
+<td>20.0</td>
+<td>vrouw</td>
+<td>240.0</td>
+<td>opgezocht</td>
+<td>7.0</td>
+<td>50.0</td>
+<td>14.0</td>
+<td>10.0</td>
+<td>2.0</td>
+<td>0.714</td>
+<td>0.056</td>
+<td>65.873</td>
+<td>701.0</td>
+<td>710.000</td>
+<td>10.0</td>
+</tr>
+<tr>
+<th>8</th>
+<td>75799c25-1be6-4e28-ab18-b2b888f8b6f9</td>
+<td>ja</td>
+<td>23.0</td>
+<td>man</td>
+<td>90.0</td>
+<td>geschat</td>
+<td>6.0</td>
+<td>50.0</td>
+<td>10.0</td>
+<td>7.0</td>
+<td>3.0</td>
+<td>0.700</td>
+<td>0.075</td>
+<td>62.500</td>
+<td>616.0</td>
+<td>617.429</td>
+<td>7.0</td>
+</tr>
+<tr>
+<th>9</th>
 <td>8f8d17b9-d72d-4f76-b254-a842afa2a753</td>
 <td>ja</td>
 <td>19.0</td>
@@ -1565,26 +2074,6 @@ Er waren 3 tests (blok) van 25 trails, geeft: 3 x 25 = 75 rijen per bestand.</p>
 <td>496.071</td>
 <td>14.0</td>
 </tr>
-<tr>
-<th>17</th>
-<td>dba49510-8676-447f-9c54-c3cbe940e907</td>
-<td>ja</td>
-<td>20.0</td>
-<td>vrouw</td>
-<td>300.0</td>
-<td>geschat</td>
-<td>9.0</td>
-<td>50.0</td>
-<td>19.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>0.0</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1612,9 +2101,9 @@ Er waren 3 tests (blok) van 25 trails, geeft: 3 x 25 = 75 rijen per bestand.</p>
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"N = </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Age: M = </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">leeftijd</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, SD = </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">leeftijd</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, range </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">leeftijd</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">leeftijd</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Leeftijd: M = </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">leeftijd</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, SD = </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">leeftijd</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, range </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">leeftijd</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">leeftijd</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Gender:"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">gender_label</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Short-form source:"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bron_label</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Short-form bron:"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bron_label</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
 
 <span class="n">desc_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"shortform_min"</span><span class="p">,</span> <span class="s2">"slaap"</span><span class="p">,</span> <span class="s2">"accuracy"</span><span class="p">,</span> <span class="s2">"hit_rate"</span><span class="p">,</span> <span class="s2">"fa_rate"</span><span class="p">,</span> <span class="s2">"rt_median"</span><span class="p">]</span>
 <span class="n">desc</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">desc_vars</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s2">"count"</span><span class="p">,</span> <span class="s2">"mean"</span><span class="p">,</span> <span class="s2">"std"</span><span class="p">,</span> <span class="s2">"median"</span><span class="p">,</span> <span class="s2">"min"</span><span class="p">,</span> <span class="s2">"max"</span><span class="p">,</span> <span class="s2">"skew"</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
@@ -1630,10 +2119,10 @@ Er waren 3 tests (blok) van 25 trails, geeft: 3 x 25 = 75 rijen per bestand.</p>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>N = 18
-Age: M = 20.4, SD = 1.5, range 17-23
-Gender: {'vrouw': 9, 'man': 7, 'anders': 1, 'zeg ik liever niet': 1}
-Short-form source: {'opgezocht': 11, 'geschat': 7}
+<pre>N = 17
+Leeftijd: M = 20.4, SD = 1.6, range 17-23
+Gender: {'vrouw': 8, 'man': 7, 'anders': 1, 'zeg ik liever niet': 1}
+Short-form bron: {'opgezocht': 11, 'geschat': 6}
 </pre>
 </div>
 </div>
@@ -1669,53 +2158,53 @@ Short-form source: {'opgezocht': 11, 'geschat': 7}
 <tbody>
 <tr>
 <th>shortform_min</th>
-<td>18.0</td>
-<td>139.611</td>
-<td>104.860</td>
+<td>17.0</td>
+<td>130.176</td>
+<td>99.903</td>
 <td>120.000</td>
-<td>0.0</td>
+<td>0.000</td>
 <td>360.000</td>
-<td>0.746</td>
+<td>0.952</td>
 </tr>
 <tr>
 <th>slaap</th>
-<td>18.0</td>
-<td>7.222</td>
-<td>1.309</td>
+<td>17.0</td>
+<td>7.118</td>
+<td>1.269</td>
 <td>7.000</td>
-<td>5.0</td>
+<td>5.000</td>
 <td>10.000</td>
-<td>0.425</td>
+<td>0.585</td>
 </tr>
 <tr>
 <th>accuracy</th>
-<td>18.0</td>
-<td>63.967</td>
-<td>26.041</td>
-<td>69.603</td>
-<td>0.0</td>
+<td>17.0</td>
+<td>67.730</td>
+<td>21.207</td>
+<td>73.333</td>
+<td>20.000</td>
 <td>96.667</td>
-<td>-1.044</td>
+<td>-0.734</td>
 </tr>
 <tr>
 <th>hit_rate</th>
-<td>18.0</td>
-<td>0.708</td>
-<td>0.240</td>
-<td>0.724</td>
-<td>0.0</td>
+<td>17.0</td>
+<td>0.749</td>
+<td>0.167</td>
+<td>0.733</td>
+<td>0.474</td>
 <td>1.000</td>
-<td>-1.472</td>
+<td>-0.151</td>
 </tr>
 <tr>
 <th>fa_rate</th>
-<td>18.0</td>
-<td>0.068</td>
-<td>0.075</td>
+<td>17.0</td>
+<td>0.072</td>
+<td>0.076</td>
 <td>0.056</td>
-<td>0.0</td>
+<td>0.000</td>
 <td>0.300</td>
-<td>1.792</td>
+<td>1.765</td>
 </tr>
 <tr>
 <th>rt_median</th>
@@ -1723,7 +2212,7 @@ Short-form source: {'opgezocht': 11, 'geschat': 7}
 <td>547.000</td>
 <td>116.363</td>
 <td>563.000</td>
-<td>370.0</td>
+<td>370.000</td>
 <td>718.000</td>
 <td>-0.141</td>
 </tr>
@@ -1776,7 +2265,68 @@ Short-form source: {'opgezocht': 11, 'geschat': 7}
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c25f5b19">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2805baeb">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Analysis">Analysis<a class="anchor-link" href="#Analysis">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=73d08b9b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">spearman</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">covar</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpearmanResult</span><span class="p">:</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">+</span> <span class="p">([</span><span class="n">covar</span><span class="p">]</span> <span class="k">if</span> <span class="n">covar</span> <span class="k">else</span> <span class="p">[])]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">covar</span><span class="p">:</span>
+        <span class="n">pc</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">partial_corr</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">covar</span><span class="o">=</span><span class="n">covar</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"spearman"</span><span class="p">)</span>
+        <span class="n">rho</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">pc</span><span class="p">[</span><span class="s2">"r"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pc</span><span class="p">[</span><span class="s2">"p_val"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">3</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rho</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="n">y</span><span class="p">])</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">SpearmanResult</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+<span class="n">opgezocht</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">bron_label</span> <span class="o">==</span> <span class="s2">"opgezocht"</span><span class="p">]</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">spearman</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>   <span class="s2">"shortform_min"</span><span class="p">,</span> <span class="s2">"accuracy"</span><span class="p">,</span>  <span class="n">label</span><span class="o">=</span><span class="s2">"Hoofd: kijktijd x accuratesse"</span><span class="p">),</span>
+    <span class="n">spearman</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>   <span class="s2">"shortform_min"</span><span class="p">,</span> <span class="s2">"rt_median"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Neven: kijktijd x RT"</span><span class="p">),</span>
+    <span class="n">spearman</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>   <span class="s2">"shortform_min"</span><span class="p">,</span> <span class="s2">"accuracy"</span><span class="p">,</span>  <span class="n">covar</span><span class="o">=</span><span class="s2">"slaap"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Covariaat: controle slaap"</span><span class="p">),</span>
+    <span class="n">spearman</span><span class="p">(</span><span class="n">opgezocht</span><span class="p">,</span> <span class="s2">"shortform_min"</span><span class="p">,</span> <span class="s2">"accuracy"</span><span class="p">,</span>  <span class="n">label</span><span class="o">=</span><span class="s2">"Sensitiviteit: alleen opgezocht"</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">apa</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Hoofd: kijktijd x accuratesse: r_s(15) = -.37, p = .145
+Neven: kijktijd x RT: r_s(15) = .58, p = .015
+Covariaat: controle slaap: r_s(14) = -.44, p = .092
+Sensitiviteit: alleen opgezocht: r_s(9) = -.30, p = .370
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c707e95b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
