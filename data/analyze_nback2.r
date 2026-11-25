@@ -315,9 +315,9 @@ for( i in 1:length(d[,1])){
         outputMean2[i,]   = rep( NA , length( conditionnames ) )
         outputMedian2[i,] = rep( NA , length( conditionnames ) )
         outputMin2[i,]    = rep( NA , length( conditionnames ) )
-        outputMax2[i,]    = rep( NA , length( conditionnames ) )
+        outputMax2[i,]    = rep( NA , length( conditionnames ) )                
         outputN2[i,]      = rep( NA , length( conditionnames ) )
-        outputPE2[i,]     = rep( NA , length( conditionnames ) )
+        outputPE2[i,]     = rep( NA , length( conditionnames ) )        
     }else{
         outputMean2[i,]   = outputMean[counter,]
         outputMedian2[i,] = outputMedian[counter,]

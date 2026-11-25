@@ -48,3 +48,14 @@ stime: 2026-11-23-11-43
 T: 4011
 t: radio
 a: 1
+l: slaap
+stime: 2026-11-23-11-43
+T: 11372
+t: textline
+a: 7
+l: einde
+stime: 2026-11-23-11-43
+T: 1166
+t: info
+endcode: 
+end 2026-11-23-11-43
