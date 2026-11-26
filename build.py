@@ -12,7 +12,11 @@ Output:
     docs/assets/jupyter.css   nbconvert's JupyterLab styles
     docs/assets/notebook.css  our styles (copied from style/notebook.css)
     docs/assets/figures/*.png every plot, as a separate file (usable in the paper)
+    docs/assets/variables.tex LaTeX macros (copied from variables.tex, written by the notebook)
     docs/.nojekyll            so GitHub Pages serves the files as-is
+
+Links in the notebook that point into the output dir (e.g. `docs/assets/x`) are
+rewritten relative to index.html, so they work both in Jupyter and on the site.
 
 Figures are named figure-1.png, figure-2.png, ... in notebook order. To give a
 figure a fixed name, add a cell tag `fig:<name>` (e.g. `fig:scatter-accuracy`).
@@ -33,6 +37,8 @@ from nbconvert import HTMLExporter
 
 ROOT = Path(__file__).resolve().parent
 STYLESHEET = ROOT / "style" / "notebook.css"
+# Extra files copied into <out>/assets/ when they exist (written by the notebook).
+EXTRA_ASSETS = [ROOT / "variables.tex"]
 IMAGE_TYPES = {"image/png": ".png", "image/jpeg": ".jpg", "image/svg+xml": ".svg"}
 
 
@@ -134,15 +140,28 @@ def main() -> None:
         page,
     )
     page = re.sub(r"<title>.*?</title>", f"<title>{html.escape(title)}</title>", page, count=1, flags=re.DOTALL)
+    # `docs/assets/x` is right from the notebook's dir, but index.html lives inside docs/.
+    if out.is_relative_to(nb_path.parent):
+        prefix = re.escape(out.relative_to(nb_path.parent).as_posix() + "/")
+        page = re.sub(rf'(href|src)="(?:\./)?{prefix}', r'\1="', page)
 
     (out / "index.html").write_text(page, encoding="utf-8")
     (assets / "jupyter.css").write_text(jupyter_css, encoding="utf-8")
     shutil.copyfile(STYLESHEET, assets / "notebook.css")
+    copied = []
+    for extra in EXTRA_ASSETS:
+        if extra.exists():
+            shutil.copyfile(extra, assets / extra.name)
+            copied.append(assets / extra.name)
+        else:
+            print(f"  warning: {extra.name} not found (run the notebook first); not copied")
     (out / ".nojekyll").touch()
 
     print(f"Built {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}/index.html from {nb_path.name}")
     for fig in figures:
         print(f"  figure: {fig.relative_to(out)}")
+    for path in copied:
+        print(f"  asset:  {path.relative_to(out)}")
 
 
 if __name__ == "__main__":
