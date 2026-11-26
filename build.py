@@ -12,7 +12,7 @@ Output:
     docs/assets/jupyter.css   nbconvert's JupyterLab styles
     docs/assets/notebook.css  our styles (copied from style/notebook.css)
     docs/assets/figures/*.png every plot, as a separate file (usable in the paper)
-    docs/assets/variables.tex LaTeX macros (copied from variables.tex, written by the notebook)
+    docs/assets/variables.tex LaTeX macros, written by the notebook (kept across builds)
     docs/.nojekyll            so GitHub Pages serves the files as-is
 
 Links in the notebook that point into the output dir (e.g. `docs/assets/x`) are
@@ -37,8 +37,8 @@ from nbconvert import HTMLExporter
 
 ROOT = Path(__file__).resolve().parent
 STYLESHEET = ROOT / "style" / "notebook.css"
-# Extra files copied into <out>/assets/ when they exist (written by the notebook).
-EXTRA_ASSETS = [ROOT / "variables.tex"]
+# Files the notebook writes into the output dir itself; kept when the dir is wiped.
+KEEP = ["assets/variables.tex"]
 IMAGE_TYPES = {"image/png": ".png", "image/jpeg": ".jpg", "image/svg+xml": ".svg"}
 
 
@@ -117,12 +117,20 @@ def main() -> None:
     assets = out / "assets"
     fig_dir = assets / "figures"
 
+    kept: dict[str, bytes] = {}
     if out.exists():
         # The output dir is wiped on every build; never wipe one we didn't create.
         if any(out.iterdir()) and not (out / ".nojekyll").exists():
             raise SystemExit(f"{out} exists and was not created by build.py; refusing to overwrite it")
+        kept = {rel: (out / rel).read_bytes() for rel in KEEP if (out / rel).is_file()}
         shutil.rmtree(out)
     fig_dir.mkdir(parents=True)
+    for rel, content in kept.items():
+        (out / rel).parent.mkdir(parents=True, exist_ok=True)
+        (out / rel).write_bytes(content)
+    for rel in KEEP:
+        if rel not in kept:
+            print(f"  warning: {out.name}/{rel} not found (run the notebook first)")
 
     nb = nbformat.read(nb_path, as_version=4)
     figures = extract_figures(nb, fig_dir)
@@ -148,20 +156,13 @@ def main() -> None:
     (out / "index.html").write_text(page, encoding="utf-8")
     (assets / "jupyter.css").write_text(jupyter_css, encoding="utf-8")
     shutil.copyfile(STYLESHEET, assets / "notebook.css")
-    copied = []
-    for extra in EXTRA_ASSETS:
-        if extra.exists():
-            shutil.copyfile(extra, assets / extra.name)
-            copied.append(assets / extra.name)
-        else:
-            print(f"  warning: {extra.name} not found (run the notebook first); not copied")
     (out / ".nojekyll").touch()
 
     print(f"Built {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}/index.html from {nb_path.name}")
     for fig in figures:
         print(f"  figure: {fig.relative_to(out)}")
-    for path in copied:
-        print(f"  asset:  {path.relative_to(out)}")
+    for rel in kept:
+        print(f"  kept:   {rel}")
 
 
 if __name__ == "__main__":
